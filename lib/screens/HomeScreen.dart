@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -41,7 +42,6 @@ class _WeatherHomeState extends State<WeatherHome> {
 
 class Main extends StatefulWidget {
   Main({Key key}) : super(key: key);
-
   @override
   MainState createState() => MainState();
 }
@@ -53,7 +53,7 @@ class MainState extends State<Main> {
   // API Fetch Logic
   Future<void> getWeather() async {
     final String searchQuery = cityGrabber.text;
-    final String appId = 'YOUR API KEY';
+    final String appId = "YOUR API KEY";
     var response = await http.get(
         'https://api.openweathermap.org/data/2.5/weather?q=$searchQuery&appid=$appId&units=metric');
     var data = json.decode(response.body);
@@ -63,10 +63,23 @@ class MainState extends State<Main> {
     if (searchQuery.isEmpty) {
       blankFieldError(context);
     }
+
     setState(() {
       mainTemp = data['main']['temp'];
       city = data['name'];
     });
+  }
+
+// Detecting network state.
+  detectConnection(connection) async {
+    connection = await (Connectivity().checkConnectivity());
+    // Checking connection status for Mobile Data & Wifi
+    if (connection != ConnectivityResult.mobile &&
+        connection != ConnectivityResult.wifi) {
+      noNetworkError(context);
+    } else {
+      getWeather();
+    }
   }
 
   @override
@@ -108,7 +121,7 @@ class MainState extends State<Main> {
               child: TextField(
                 controller: cityGrabber,
                 onSubmitted: (callback) => {
-                  getWeather(),
+                  detectConnection(context),
                 },
                 style: GoogleFonts.quicksand(
                   textStyle: TextStyle(
@@ -274,6 +287,47 @@ blankFieldError(BuildContext context) {
                     style: GoogleFonts.quicksand(
                       textStyle: TextStyle(
                           fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700]),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actionsPadding: EdgeInsets.all(10),
+          contentPadding: EdgeInsets.all(10),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        );
+      });
+}
+
+noNetworkError(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Container(
+            height: 170,
+            width: 200,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/no-signal.svg',
+                  height: 70,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 15.0),
+                  child: Text(
+                    "No Network",
+                    style: GoogleFonts.quicksand(
+                      textStyle: TextStyle(
+                          fontSize: 23,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[700]),
                     ),
