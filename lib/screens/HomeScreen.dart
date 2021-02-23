@@ -324,7 +324,7 @@ noNetworkError(BuildContext context) {
                 Padding(
                   padding: const EdgeInsets.only(top: 15.0),
                   child: Text(
-                    "No Network",
+                    "No Internet",
                     style: GoogleFonts.quicksand(
                       textStyle: TextStyle(
                           fontSize: 23,
