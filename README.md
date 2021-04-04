@@ -1,6 +1,7 @@
 # Weatherify
 * A Weather app for fetching current weather details of any city in the world.
 * This App has been built using Flutter.
+* APK is attached in the release section. Give it a try. 
 
 # Credits
 * Open Weather API. (https://openweathermap.org/api)
